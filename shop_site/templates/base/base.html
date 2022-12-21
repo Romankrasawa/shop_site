@@ -1,0 +1,31 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name=”viewport” content=”width=device-width, initial-scale=1.0″>
+    {% block extra_css %}
+    <link rel="stylesheet" href="{% static 'bootstrap/dist/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'base/css/header.css' %}">
+    {% endblock %}
+    <title>{%block title%}Title{%endblock%}</title>
+</head>
+<body>
+    {%include "base/header.html"%}
+    {%include "base/phone_header.html"%}
+    <div class="content bg-dark p-2">
+
+        {% block content %}
+        
+        {% endblock %}
+
+    </div>
+    {%include "base/flash_message.html"%}
+    {%include "base/footer.html"%}
+    {% block extra_script %}
+    <script src="{% static 'bootstrap/dist/js/bootstrap.min.js' %}"></script>
+    {% endblock %}
+</body>
+</html>
