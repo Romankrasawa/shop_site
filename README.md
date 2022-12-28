@@ -1,1 +1,1 @@
-<h1>THis is my shop-site<h1>
+<h1>THis is shop-site<h1>
