@@ -112,18 +112,40 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname}|{asctime}|{name}|{user}|{message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file':{
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR.parent / 'debug.log',
+            'formatter': 'verbose'
+        },
+    },
+    # 'root': {
+    #     'handlers': ['file'],
+    #     'level': 'INFO',
+    # },
+    'loggers': {
+        'shop': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-
-LANGUAGES = [
-    ('en','English'),
-    ('es', 'Spanish'),
-    ('pl', 'Polish'),
-    ('uk', 'Ukrainian')
-]
+LANGUAGE_CODE = 'uk'
 
 TIME_ZONE = 'UTC'
 

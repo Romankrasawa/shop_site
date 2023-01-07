@@ -8,6 +8,6 @@ urlpatterns = [
     re_path(r'^search/', search, name='search'),
     re_path(r'^catalog/', catalog, name='catalog'),
     re_path(r'^category/', category, name='category'),
-    re_path(r'^home/', home, name='home'),
-    re_path(r'', home, name='home')
+    # re_path(r'^home/', home, name='home'),
+    # re_path(r'', home, name='home')
 ]
