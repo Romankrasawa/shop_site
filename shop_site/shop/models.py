@@ -27,6 +27,10 @@ class Category(models.Model):
     name = models.CharField(max_length=25, choices=Categories.choices, verbose_name="Назва")
     name_plural = models.CharField(max_length=25, choices=Categories_plural.choices, verbose_name="Назва в множині")
 
+    class Meta:
+        verbose_name = "Категорія"
+        verbose_name_plural = "Категорії"
+
 class Product(models.Model):
 
     code = models.CharField(max_length=10, primary_key=True, default=create_product_code, editable=False, unique=True)
@@ -40,9 +44,13 @@ class Product(models.Model):
     on_sale = models.BooleanField(verbose_name="На акції")
     sale_price = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Акція", blank=True, null=True)
     description = models.CharField(max_length=2500, verbose_name="Опис")
+    release_year = models.PositiveIntegerField(verbose_name="Рік випуску моделі")
     number_aviable = models.PositiveIntegerField(verbose_name="Кількість")
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="product", verbose_name="Категорія")
-    producing_country = models.CharField(max_length = 4, choices = Countries.choices, verbose_name="Країна виробник")
+    producing_country = models.CharField(max_length = 50, verbose_name="Країна виробник")
+    additional_characteristics = ArrayField(models.CharField(max_length = 50), size=20,blank=True, null=True, verbose_name="Додаткові характеристики")
+    complect = ArrayField(models.CharField(max_length = 50), size=20, verbose_name="Комплектація")
+    garanty = models.PositiveIntegerField(verbose_name="Гарантія")
     views = models.PositiveIntegerField(verbose_name="Перегляди")
 
     content_type = models.ForeignKey(ContentType,  on_delete=models.CASCADE)
@@ -74,6 +82,10 @@ class Product_photo(models.Model):
 
     photo = models.ImageField(upload_to=photos_file_name, verbose_name="Фото", default='default/default_photo.jpg')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name="Продукт", related_name='product_photo')
+
+    class Meta:
+        verbose_name = "Фото товару"
+        verbose_name_plural = "Фото товарів"
 
 
 class Laptop(models.Model):
@@ -109,7 +121,7 @@ class Laptop(models.Model):
     optical_drive = models.BooleanField(verbose_name='Оптичний привід')
     fingerprint_scaner = models.BooleanField(verbose_name='Сканер відбитку пальця')
     backlight = models.BooleanField(verbose_name="Підсвітка")
-    connectors_ports = ArrayField(models.CharField(max_length = 100), size=20, verbose_name="Розєми та порти")
+    connectors_ports = ArrayField(models.CharField(max_length = 20), size=20, verbose_name="Розєми та порти")
     colour = models.CharField(max_length = 8, choices=CustomColours.choices, verbose_name="Колір")
     material = models.CharField(max_length=15, choices=Material.choices, verbose_name="Матеріал")
     acumulator_size = models.IntegerField(verbose_name="Обєм акумулятора")
@@ -206,7 +218,7 @@ class PC(models.Model):
     bluetooth_adpter = models.BooleanField(verbose_name="Bluetooth адаптер")
     optical_drive = models.BooleanField(verbose_name='Оптичний привід')
     backlight = models.BooleanField(verbose_name="Підсвітка")
-    connectors_ports = ArrayField(models.CharField(max_length = 100), size=20, verbose_name="Розєми та порти")
+    connectors_ports = ArrayField(models.CharField(max_length = 20), size=20, verbose_name="Розєми та порти")
     colour = models.CharField(max_length = 8, choices=CustomColours.choices, verbose_name="Колір")
     material = models.CharField(max_length= 15, choices=Material.choices, verbose_name="Матеріал")
 
@@ -310,8 +322,8 @@ class Phone(models.Model):
     fingerprint_scaner = models.BooleanField(verbose_name="Сканер відбитку пальця")
     main_camera = ArrayField(models.PositiveIntegerField(), size=10, verbose_name="Основна камера")
     front_camera = models.PositiveIntegerField(verbose_name="Фронтальна камера")
-    camera_features = ArrayField(models.CharField(max_length = 100), size=20, verbose_name="Особливосві камери")
-    connectors_ports = ArrayField(models.CharField(max_length = 100), size=20, verbose_name="Розєми та порти")
+    camera_features = ArrayField(models.CharField(max_length = 50), size=20, verbose_name="Особливосві камери")
+    connectors_ports = ArrayField(models.CharField(max_length = 20), size=20, verbose_name="Розєми та порти")
     colour = models.CharField(max_length = 8, choices=CustomColours.choices, verbose_name="Колір")
     material = models.CharField(max_length = 15, choices=Material.choices, verbose_name="Матеріал")
     acumulator_size = models.IntegerField(verbose_name="Обєм акумулятора")
@@ -373,4 +385,271 @@ class Phone(models.Model):
         verbose_name = 'Телефон'
         verbose_name_plural = 'Телефони'
 
+class Tablet(models.Model):
 
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+
+    seria = models.CharField(max_length = 100, verbose_name="Серія")
+    G2 = models.BooleanField(verbose_name="2G(GPRS/EDGE)")
+    G3 = models.BooleanField(verbose_name="3G(WCDMA/UMTS/HSPA)")
+    LTE = models.BooleanField(verbose_name="4G(LTE)")
+    G5 = models.BooleanField(verbose_name="5G")
+    eSIM = models.BooleanField(verbose_name="eSIM")
+    sim_num = models.PositiveIntegerField(verbose_name="Кількість слотів для sim карт")
+    sim_type = models.CharField(max_length=10, choices=Sim_type.choices, verbose_name="Розмір sim карти")
+    screen_diagonal = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Діагональ екрану")
+    screen_type = models.CharField(max_length = 30, choices=Screen_types.choices, verbose_name="Тип екрану")
+    screen_refresh_rate = models.PositiveIntegerField(verbose_name="Частота оновлення екрану")
+    resolution = models.CharField(max_length = 20, verbose_name="Роздільна здатність", validators=[RegexValidator(
+        regex="\d+x\d+",
+        message="Розширення екрану повинно бути такого типу: 1920x1080"
+        ),])
+    videocore = models.CharField(max_length = 50,  verbose_name="Відеоядро")
+    RAM_size = models.PositiveIntegerField(verbose_name="Кількість оперативної памяті")
+    MicroSD_aviable =  models.BooleanField(verbose_name="Наявність MicroSD")
+    MicroSD_max = models.PositiveIntegerField(verbose_name="Максимальний розмір MicroSD", null=True, blank=True)
+    storage = models.PositiveIntegerField(verbose_name="Кількість вбудованої памяті")
+    processor = models.CharField(max_length = 50, verbose_name="Процессор")
+    processor_hertz = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Частота процессора")
+    cores_num = models.IntegerField(verbose_name="Кількість ядер")
+    OS = models.CharField(max_length = 14, choices = MobileOSes.choices, verbose_name="Операційна система")
+    wifi_adapter = models.BooleanField(verbose_name="Wifi адаптер")
+    bluetooth_adpter = models.BooleanField(verbose_name="Bluetooth адаптер")
+    NFC = models.BooleanField(verbose_name="NFC")
+    GPS = models.BooleanField(verbose_name="GPS")
+    wireless_charging = models.BooleanField(verbose_name="Безпровідна зарядка")
+    face_scaner = models.BooleanField(verbose_name="Розблокування за обличчям")
+    flashlight = models.BooleanField(verbose_name="Фанарик")
+    fingerprint_scaner = models.BooleanField(verbose_name="Сканер відбитку пальця")
+    main_camera = ArrayField(models.PositiveIntegerField(), size=10, verbose_name="Основна камера")
+    front_camera = models.PositiveIntegerField(verbose_name="Фронтальна камера")
+    camera_features = ArrayField(models.CharField(max_length = 50), size=20, verbose_name="Особливосві камери")
+    connectors_ports = ArrayField(models.CharField(max_length = 20), size=20, verbose_name="Розєми та порти")
+    colour = models.CharField(max_length = 8, choices=CustomColours.choices, verbose_name="Колір")
+    material = models.CharField(max_length = 15, choices=Material.choices, verbose_name="Матеріал")
+    acumulator_size = models.IntegerField(verbose_name="Обєм акумулятора")
+
+    width = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Ширина")
+    height = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Висота")
+    lenght = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Довжина")
+    weight = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Вага")
+
+    product = GenericRelation(Product, related_query_name='tablet')
+
+    
+
+    @property
+    def size(self):
+        return f"{self.lenght}x{self.width}x{self.height}"
+    size.fget.short_description = 'Розмір'
+
+    @property
+    def main_camera_num(self):
+        return len(self.main_camera)
+    main_camera_num.fget.short_description = "Кількість Основних Камер"
+
+    @property
+    def get_camera(self):
+        return " + ".join([f"{i} Мп" for i in self.main_camera])
+    get_camera.fget.short_description = 'Камери'
+
+
+    @property
+    def short_characteristics(self):
+        return f"Екран: ({self.screen_diagonal} \
+                {self.get_screen_type_display()} \
+                {self.resolution}) / \
+                {self.processor} \
+                ({self.cores_num} x {self.processor_hertz} ГГц) / \
+                Основна камера: {self.get_camera} ,\
+                Фронтальна: {self.front_camera} Мп / \
+                RAM {self.RAM_size} ГБ / \
+                {self.storage} ГБ Вбудованої памяті {f'+ MicroSD (До {self.MicroSD_max} МБ)' if self.MicroSD_aviable else ''} / \
+                {'3G / ' if self.G3 else ''}\
+                {'LTE / ' if self.LTE else ''}\
+                {'5G / ' if self.G5 else ''}\
+                {'GPS / ' if self.GPS else ''}\
+                {f'Підтримка {self.sim_num}x (self.sim_type)' if self.sim_num > 1 else f'{self.sim_type}'}\
+                {', eSIM / ' if self.eSIM else ' / '}\
+                {self.get_OS_display()} / \
+                {self.size} мм/ \
+                {self.acumulator_size} Ма"
+
+    def clean(self):
+        if self.MicroSD_aviable and self.MicroSD_max == None:
+            raise ValidationError("Виберіть максимальну кількість памяті MicroSD")
+
+    def __str__(self):
+        return str(self.id)
+
+    class Meta:
+        verbose_name = 'Планшет'
+        verbose_name_plural = 'Планшети'
+
+class TV(models.Model):
+
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+
+    screen_diagonal = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Діагональ екрану")
+    screen_type = models.CharField(max_length = 30, choices=Screen_types.choices, verbose_name="Тип екрану")
+    screen_refresh_rate = models.PositiveIntegerField(verbose_name="Частота оновлення екрану")
+    resolution = models.CharField(max_length = 20, verbose_name="Роздільна здатність", validators=[RegexValidator(
+        regex="\d+x\d+",
+        message="Розширення екрану повинно бути такого типу: 1920x1080"
+        ),])
+    videocore = models.CharField(max_length = 50,  verbose_name="Процессор зображення")
+    RAM_size = models.PositiveIntegerField(verbose_name="Кількість оперативної памяті")
+    storage = models.PositiveIntegerField(verbose_name="Кількість вбудованої памяті")
+    OS = models.CharField(max_length = 14, choices = MobileOSes.choices, verbose_name="Операційна система")
+    wifi_adapter = models.BooleanField(verbose_name="Wifi адаптер")
+    bluetooth_adpter = models.BooleanField(verbose_name="Bluetooth адаптер")
+    web_camera = models.BooleanField(verbose_name="Камера")
+    smart_tv = models.BooleanField(verbose_name="Smart TV")
+    sound_control = models.BooleanField(verbose_name="Управління голосом")
+    phone_control = models.BooleanField(verbose_name="Управління телефоном")
+    energy_consumption = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Енергоспоживання")
+    connectors_ports = ArrayField(models.CharField(max_length = 20), size=20, verbose_name="Розєми та порти")
+    tuner_diapazon = ArrayField(models.CharField(max_length = 20), size=20, verbose_name="Діапазони цифрового тюнера")
+    colour = models.CharField(max_length = 8, choices=CustomColours.choices, verbose_name="Колір")
+    material = models.CharField(max_length = 15, choices=Material.choices, verbose_name="Матеріал")
+
+    width = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Ширина")
+    height = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Висота")
+    lenght = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Довжина")
+    weight = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Вага")
+
+    product = GenericRelation(Product, related_query_name='tv')
+
+    
+
+    @property
+    def size(self):
+        return f"{self.lenght}x{self.width}x{self.height}"
+    size.fget.short_description = 'Розмір'
+
+    @property
+    def get_tuner_diapazon(self):
+        return ", ".join(self.tuner_diapazon)
+    get_tuner_diapazon.fget.short_description = 'Діапазони цифрового тюнера'
+
+    @property
+    def short_characteristics(self):
+        return f"Діагональ екрану: ({self.screen_diagonal} /\
+                Тип Екрану: {self.get_screen_type_display()} /\
+                Роздільна здатність: {self.resolution}) / /\
+                Частота оновлення екрану: {self.screen_refresh_rate}\
+                Операційна симстема{self.get_OS_display()} / / \
+                Розмір: {self.size} / \
+                Діапазони цифрового тюнера: {self.get_tuner_diapazon} "
+
+    def __str__(self):
+        return str(self.id)
+
+    class Meta:
+        verbose_name = 'Телевізор'
+        verbose_name_plural = 'Телевізори'
+
+class Monitor(models.Model):
+
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+
+    screen_diagonal = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Діагональ екрану")
+    screen_type = models.CharField(max_length = 30, choices=Screen_types.choices, verbose_name="Тип екрану")
+    screen_refresh_rate = models.PositiveIntegerField(verbose_name="Частота оновлення екрану")
+    resolution = models.CharField(max_length = 20, verbose_name="Роздільна здатність", validators=[RegexValidator(
+        regex="\d+x\d+",
+        message="Розширення екрану повинно бути такого типу: 1920x1080"
+        ),])
+    brightness = models.PositiveIntegerField(verbose_name="Яскравість дисплею", validators=[RegexValidator(
+        regex="\d+:\d+",
+        message="Яскравість дисплею повинна бути такого типу: 2500:1"
+        ),])
+    horizontal_angle = models.PositiveIntegerField(verbose_name="Кут огляду горизонтальний")
+    vertical_angle = models.PositiveIntegerField(verbose_name="Кут огляду вертикальний")
+    reaction_time = models.PositiveIntegerField(verbose_name="Час реакції матриці")
+    relationship_of_parties = models.CharField(max_length = 14, verbose_name="Відношення сторін", validators=[RegexValidator(
+        regex="\d+:\d+",
+        message="Відношення сторін повинно бути такого типу: 16:9"
+        ),])
+    speacers = models.BooleanField(verbose_name="Вбудовані колонки")
+    web_camera = models.BooleanField(verbose_name="Камера")
+    energy_consumption = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Енергоспоживання")
+    connectors_ports = ArrayField(models.CharField(max_length = 20), size=20, verbose_name="Розєми та порти")
+    colour = models.CharField(max_length = 8, choices=CustomColours.choices, verbose_name="Колір")
+    material = models.CharField(max_length = 15, choices=Material.choices, verbose_name="Матеріал")
+
+    width = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Ширина")
+    height = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Висота")
+    lenght = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Довжина")
+    weight = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Вага")
+
+    product = GenericRelation(Product, related_query_name='monitor')
+
+    
+
+    @property
+    def size(self):
+        return f"{self.lenght}x{self.width}x{self.height}"
+    size.fget.short_description = 'Розмір'
+
+    @property
+    def short_characteristics(self):
+        return f"Діагональ екрану: ({self.screen_diagonal} /\
+                Тип Екрану: {self.get_screen_type_display()} /\
+                Роздільна здатність: {self.resolution}) / /\
+                Частота оновлення екрану: {self.screen_refresh_rate}"
+
+    def __str__(self):
+        return str(self.id)
+
+    class Meta:
+        verbose_name = 'Монітор'
+        verbose_name_plural = 'Монітори'
+
+class Headphones(models.Model):
+
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+
+    headphones_type = models.CharField(max_length = 30, choices=Headphones_type.choices, verbose_name="Тип навушниів")
+    connection_type = models.CharField(max_length = 30, choices=Connection_type.choices, verbose_name="Тип навушниів")
+    charging_time = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Час заряджання", blank=True, null=True)
+    work_time = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Час роботи", blank=True, null=True)
+    work_radius = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Радіус дії", blank=True, null=True)
+    cabel_lenght = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Довжина кабелю", blank=True, null=True)
+    impedance = models.PositiveIntegerField(verbose_name="Імпеданс")
+    noise_reduction = models.BooleanField(verbose_name="Шумозаглюшення")
+    microphone = models.BooleanField(verbose_name="Мікрофон")
+    microphone_num = models.PositiveIntegerField(verbose_name="Кількість мікрофонів", blank=True, null=True)
+    microphone_sensivity = models.PositiveIntegerField(verbose_name="Чутливість мікрофону", blank=True, null=True)
+    codec_support = ArrayField(models.CharField(max_length = 20), size=20, verbose_name="Підтримка кодеків")
+    connectors_ports = ArrayField(models.CharField(max_length = 20), size=20, verbose_name="Розєми та порти")
+    colour = models.CharField(max_length = 8, choices=CustomColours.choices, verbose_name="Колір")
+    material = models.CharField(max_length = 15, choices=Material.choices, verbose_name="Матеріал")
+    weight = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Вага")
+
+    product = GenericRelation(Product, related_query_name='headphones')
+
+    @property
+    def short_characteristics(self):
+        return f"Тип: {self.get_headphones_type_display()}\
+                Мікрофон: {'Наявний' if self.microphone else 'Немає'}"
+
+    def clean(self):
+        if self.headphones_type == "Wireless" and (self.charging_time == None or self.work_time == None or self.work_radius == None or not(self.cabel_lenght == Null)):
+            raise ValueError("Введіть коректні дані для Безпровідного типу зєднання")
+        elif self.headphones_type == "Leading" and (not(self.charging_time == None) or not(self.work_time == None) or not(self.work_radius == None) or self.cabel_lenght == Null):
+            raise ValueError("Введіть коректні дані для Провідного типу зєднання")
+        elif self.headphones_type == "Combinated" and not(all([self.cabel_lenght, self.work_radius, self.work_time, self.charging_time])):
+            raise ValueError('Введіть коректні дані для комбінованого типу зєднання')
+        if self.microphone and not(all([self.microphone_num, microphone_sensivity])):
+            raise ValueError("Введіть дані які необхідні за наявності мікрофону")
+        if not(self.microphone) and any([self.microphone_num, microphone_sensivity]):
+            raise ValueError("Ви ввели дані для мікрофону не вибравши його")
+
+
+    def __str__(self):
+        return str(self.id)
+
+    class Meta:
+        verbose_name = 'Монітор'
+        verbose_name_plural = 'Монітори'

@@ -1,5 +1,17 @@
 from django.db import models
 
+class Headphones_type(models.TextChoices):
+    Vacum = "Vacum", "Вакумні"
+    TABS = "Tabs", "Вкладки"
+    TWS = "TWS", "TWS"
+    LOADED = "Loaded", "Накладні"
+    FULLSIZED = "Fullsized", "Повнорозмірні"
+
+class Connection_type(models.TextChoices):
+    WIRELESS = "Wireless", "Безпровідний"
+    LEADING = "Leading", "Провідний"
+    COMBINATED = "Combinated", "Комбінований"
+
 class Sim_type(models.TextChoices):
     MINI_SIM = "Mini_SIM", "Mini SIM"
     MICRO_SIM = "Micro_SIM", "Micro SIM"
@@ -108,34 +120,4 @@ class OSes(models.TextChoices):
     MAC = "MAC", "Мак ОС"
     LIN = "LIN", "Лінукс"
     WITHOUTOS = "WITHOUTOS", "Без операційної системи"
-
-class Countries(models.TextChoices):
-    UA = "UA", "Україна"
-    USA = "USA", "Сполучені Штати"
-    JPN = "JPN", "Японія"
-    KOR = "KOR", "Південна Корея"
-    DE = "DE", "Німеччина"
-    SG = "SG", "Сінгапур"
-    UK = "UK", "Великобританія"
-    SE = "SE", "Швеція"
-    IE= "IE", "Ірландія"
-    IL = "IL", "Ізраїль"
-    CA = "CA", "Канада"
-    CH = "CH", "Швейцарія"
-    FI = "FI", "Фінляндія"
-    FR = "FR", "Франція"
-    NL = "NL", "Нідерланди"
-    NO = "NO", "Норвегія"
-    CZ = "CZ", "Чехія"
-    DK = "DK", "Данія"
-    IN = "IN", "Індія"
-    ID = "ID", "Індонезія"
-    AE = "AE", "Арабські Імірати"
-    ASTL = "ASTL", "Австралія"
-    AUST = "AUST", "Австрія"
-    IT = "IT", "Італія"
-    ES = "ES","Іспанія"
-    PK = "PK", "Пакістан"
-    RUS = "RUS", "росія"
-
 
