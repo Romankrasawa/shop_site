@@ -1,7 +1,7 @@
 version: '3.5'
 
 services:
-  postgres:
+  db:
     container_name: postgres_container
     image: postgres
     environment:
@@ -9,9 +9,22 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
       PGDATA: /data/postgres
     volumes:
-       - postgres:/data/postgres
+       - db:/data/postgres
     ports:
       - "5432:5432"
     restart: unless-stopped
+  cache:
+    container_name: redis_container
+    image: redis
+    environment:
+        ALLOW_EMPTY_PASSWORD: yes
+    volumes: 
+      - cache:/data
+    ports:
+      - '6379:6379'
+    restart: unless-stopped
 volumes:
-    postgres:
+    db: 
+      driver: local
+    cache:
+      driver: local

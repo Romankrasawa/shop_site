@@ -1,5 +1,48 @@
 from django.db import models
 
+class OrderStatus(models.TextChoices):
+    Completed = "Completed", "Виконане"
+    Delivery = "Delivery", "В процессі доставки"
+    Payment = "Payment", "В процессі оплати"
+    Cancelled = "Cancelled", "Скасоване"
+
+class PaymentMethod(models.TextChoices):
+    CASH = "Cash", "Готівкою при отриманні"
+    CARD = "Card", "Картою"
+
+class DeleveryMethod(models.TextChoices):
+    SELF_DELIVERY = "Self_Delivery", "Самовивіз з відділення"
+    HOME_DELIVERY = "Home_Delivery", "Доставка до дому"
+    POST_DELIVERY = "Post_Delivery", "Самовивіз з відділення пошти"
+
+class OSes_compability(models.TextChoices):
+    MICROSOFT_WINDOWS = "Microsoft_Windows", "Microsoft Windows"
+    MACOS = "MacOS", "MacOS"
+    LINUX = "Linux", "Linux"
+    IOS = "IOS", "IOS"
+    ANDROID = "Android", "Android"
+    IPADOS = "IpadOS", "IpadOS"
+    OTHER = "Other", "Other"
+
+class Keyboard_form(models.TextChoices):
+    THIN = "Thin", "Тонка"
+    FULLSIZED = "Fullsized", "Повнорозмірна"
+    NUMPAD = "Numpad", "Цифровий блок"
+    ULTRACOMPACT = "Ultracompact", "Ультракомпактна"
+    ERGONOMIC = "Ergonomic", "Ергономічна"
+    WITHOUT_NUMPAD = "Without_numpad", "Без цифрового блоку"
+
+class Keyboard_type(models.TextChoices):
+    MEMBRANIC = "Membranic", "Мембранна"
+    MECHANIC = "Mechanic", "Механічна"
+    COMBINATED = "Combinated", "Комбіновані мембранні + механічні"
+    BUTERFLIES = "Buterflies", "Ножиці"
+
+class Mouse_button_type(models.TextChoices):
+    Clasical = "Clasical", "Класичні"
+    Double_click = "Double_click", 'Подвійний клік'
+    Programming = "Programming", "Програмовані"
+
 class Headphones_type(models.TextChoices):
     Vacum = "Vacum", "Вакумні"
     TABS = "Tabs", "Вкладки"

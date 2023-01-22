@@ -18,9 +18,8 @@ from .choices import *
 def photos_file_name(self, filename):
     return f"photos/{self.product.pk}/{filename}"
 
-def create_product_code():
-    print( "".join([str(randint(0, 9)) for i in range(10)]))
-    return "".join([str(randint(0, 9)) for i in range(10)])
+def create_code():
+    return "".join([str(randint(0, 9)) for _ in range(15)])
 
 
 class Category(models.Model):
@@ -33,7 +32,7 @@ class Category(models.Model):
 
 class Product(models.Model):
 
-    code = models.CharField(max_length=10, primary_key=True, default=create_product_code, editable=False, unique=True)
+    code = models.CharField(max_length=15, primary_key=True, default=create_code, editable=False, unique=True)
     slug = models.SlugField(max_length=100, blank=True)
     brend = models.CharField(max_length=50, verbose_name="Бренд")
     name = models.CharField(max_length=100, verbose_name="Назва", unique=True)
@@ -87,6 +86,10 @@ class Product_photo(models.Model):
         verbose_name = "Фото товару"
         verbose_name_plural = "Фото товарів"
 
+class Order(models.Model):
+    code = models.CharField(max_length=15, primary_key=True, default=create_code, editable=False, unique=True)
+    status = models.CharField(max_length=15, choices=OrderStatus.choices, verbose_name="Замовлення")
+    
 
 class Laptop(models.Model):
 
@@ -376,7 +379,7 @@ class Phone(models.Model):
 
     def clean(self):
         if self.MicroSD_aviable and self.MicroSD_max == None:
-            raise ValidationError("Виберіть максимальну кількість памяті MicroSD")
+           raise ValidationError("Виберіть максимальну кількість памяті MicroSD")
 
     def __str__(self):
         return str(self.id)
@@ -573,6 +576,7 @@ class Monitor(models.Model):
         ),])
     speacers = models.BooleanField(verbose_name="Вбудовані колонки")
     web_camera = models.BooleanField(verbose_name="Камера")
+    backlight = models.BooleanField(verbose_name="Підсвітка")
     energy_consumption = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Енергоспоживання")
     connectors_ports = ArrayField(models.CharField(max_length = 20), size=20, verbose_name="Розєми та порти")
     colour = models.CharField(max_length = 8, choices=CustomColours.choices, verbose_name="Колір")
@@ -611,14 +615,16 @@ class Headphones(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
 
     headphones_type = models.CharField(max_length = 30, choices=Headphones_type.choices, verbose_name="Тип навушниів")
-    connection_type = models.CharField(max_length = 30, choices=Connection_type.choices, verbose_name="Тип навушниів")
+    connection_type = models.CharField(max_length = 30, choices=Connection_type.choices, verbose_name="Тип підключення")
     charging_time = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Час заряджання", blank=True, null=True)
     work_time = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Час роботи", blank=True, null=True)
     work_radius = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Радіус дії", blank=True, null=True)
     cabel_lenght = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Довжина кабелю", blank=True, null=True)
     impedance = models.PositiveIntegerField(verbose_name="Імпеданс")
     noise_reduction = models.BooleanField(verbose_name="Шумозаглюшення")
+    OS = ArrayField(models.CharField(max_length = 17, choices = OSes_compability.choices), size=3, verbose_name="Сумісність з ОС") 
     microphone = models.BooleanField(verbose_name="Мікрофон")
+    backlight = models.BooleanField(verbose_name="Підсвітка")
     microphone_num = models.PositiveIntegerField(verbose_name="Кількість мікрофонів", blank=True, null=True)
     microphone_sensivity = models.PositiveIntegerField(verbose_name="Чутливість мікрофону", blank=True, null=True)
     codec_support = ArrayField(models.CharField(max_length = 20), size=20, verbose_name="Підтримка кодеків")
@@ -631,7 +637,8 @@ class Headphones(models.Model):
 
     @property
     def short_characteristics(self):
-        return f"Тип: {self.get_headphones_type_display()}\
+        return f"Тип: {self.get_headphones_type_display()} / \
+                Підєднання: {self.connection_type}\
                 Мікрофон: {'Наявний' if self.microphone else 'Немає'}"
 
     def clean(self):
@@ -651,5 +658,131 @@ class Headphones(models.Model):
         return str(self.id)
 
     class Meta:
-        verbose_name = 'Монітор'
-        verbose_name_plural = 'Монітори'
+        verbose_name = 'Навушники'
+        verbose_name_plural = 'Навашники'
+
+class Mouse(models.Model):
+
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+
+    buttons_type = models.CharField(max_length = 30, choices=Mouse_button_type.choices, verbose_name="Тип Кнопок")
+    connection_type = models.CharField(max_length = 30, choices=Connection_type.choices, verbose_name="Тип підключення")
+    charging_time = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Час заряджання", blank=True, null=True)
+    work_time = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Час роботи", blank=True, null=True)
+    work_radius = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Радіус дії", blank=True, null=True)
+    cabel_lenght = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Довжина кабелю", blank=True, null=True)
+    max_dpi = models.PositiveIntegerField(verbose_name="Максимальне значення dpi")
+    OS = ArrayField(models.CharField(max_length = 17, choices = OSes_compability.choices), size=3, verbose_name="Сумісність з ОС")
+    connectors_ports = ArrayField(models.CharField(max_length = 20), size=20, verbose_name="Розєми та порти")
+    backlight = models.BooleanField(verbose_name="Підсвітка")
+    simetrical = models.BooleanField(verbose_name="Для обох рук(семетрична)")
+    colour = models.CharField(max_length = 8, choices=CustomColours.choices, verbose_name="Колір")
+    material = models.CharField(max_length = 15, choices=Material.choices, verbose_name="Матеріал")
+
+    width = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Ширина")
+    height = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Висота")
+    lenght = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Довжина")
+    weight = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Вага")
+
+    product = GenericRelation(Product, related_query_name='mouse')
+
+    @property
+    def size(self):
+        return f"{self.lenght}x{self.width}x{self.height}"
+    size.fget.short_description = 'Розмір'
+
+    @property
+    def get_OS(self):
+        return ", ".join(self.OS)
+    get_OS.fget.short_description = 'Сумісність з ОС'
+
+    @property
+    def short_characteristics(self):
+        return f"Кнопки: {self.get_buttons_type_display()} / \
+                Підєднання: {self.connection_type} / \
+                {'Особливості: ' if any([self.backlight, self.simetrical]) else ''}\
+                {'Підсвітка, ' if self.backlight else ''}\
+                {'Для обох рук(семетрична)' if self.simetrical else ''} / \
+                Сумісність з ОС: {self.get_OS}"
+
+    def clean(self):
+        if self.headphones_type == "Wireless" and (self.charging_time == None or self.work_time == None or self.work_radius == None or not(self.cabel_lenght == Null)):
+            raise ValueError("Введіть коректні дані для Безпровідного типу зєднання")
+        elif self.headphones_type == "Leading" and (not(self.charging_time == None) or not(self.work_time == None) or not(self.work_radius == None) or self.cabel_lenght == Null):
+            raise ValueError("Введіть коректні дані для Провідного типу зєднання")
+        elif self.headphones_type == "Combinated" and not(all([self.cabel_lenght, self.work_radius, self.work_time, self.charging_time])):
+            raise ValueError('Введіть коректні дані для комбінованого типу зєднання')
+
+
+    def __str__(self):
+        return str(self.id)
+
+    class Meta:
+        verbose_name = 'Мишка'
+        verbose_name_plural = 'Мишки'
+
+class Keyboard(models.Model):
+
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+
+    keyboard_type = models.CharField(max_length = 30, choices=Keyboard_type.choices, verbose_name="Тип Кнопок")
+    connection_type = models.CharField(max_length = 30, choices=Connection_type.choices, verbose_name="Тип підключення")
+    charging_time = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Час заряджання", blank=True, null=True)
+    work_time = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Час роботи", blank=True, null=True)
+    work_radius = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Радіус дії", blank=True, null=True)
+    cabel_lenght = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Довжина кабелю", blank=True, null=True)
+    max_dpi = models.PositiveIntegerField(verbose_name="Максимальне значення dpi")
+    OS = ArrayField(models.CharField(max_length = 17, choices = OSes_compability.choices), size=3, verbose_name="Сумісність з ОС")
+
+    connectors_ports = ArrayField(models.CharField(max_length = 20), size=20, verbose_name="Розєми та порти")
+    hands = models.BooleanField(verbose_name="Підсвітка")
+
+    simetrical = models.BooleanField(verbose_name="Для обох рук(семетрична)")
+    colour = models.CharField(max_length = 8, choices=CustomColours.choices, verbose_name="Колір")
+    material = models.CharField(max_length = 15, choices=Material.choices, verbose_name="Матеріал")
+
+    width = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Ширина")
+    height = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Висота")
+    lenght = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Довжина")
+    weight = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Вага")
+
+    product = GenericRelation(Product, related_query_name='keyboard')
+
+    @property
+    def size(self):
+        return f"{self.lenght}x{self.width}x{self.height}"
+    size.fget.short_description = 'Розмір'
+
+    @property
+    def get_OS(self):
+        return ", ".join(self.OS)
+    get_OS.fget.short_description = 'Сумісність з ОС'
+
+    @property
+    def short_characteristics(self):
+        return f"Кнопки: {self.get_buttons_type_display()} / \
+                Підєднання: {self.connection_type} / \
+                {'Особливості: ' if any([self.backlight, self.simetrical]) else ''}\
+                {'Підсвітка, ' if self.backlight else ''}\
+                {'Для обох рук(семетрична)' if self.simetrical else ''} / \
+                Сумісність з ОС: {self.get_OS}"
+
+    def clean(self):
+        if self.headphones_type == "Wireless" and (self.charging_time == None or self.work_time == None or self.work_radius == None or not(self.cabel_lenght == Null)):
+            raise ValueError("Введіть коректні дані для Безпровідного типу зєднання")
+        elif self.headphones_type == "Leading" and (not(self.charging_time == None) or not(self.work_time == None) or not(self.work_radius == None) or self.cabel_lenght == Null):
+            raise ValueError("Введіть коректні дані для Провідного типу зєднання")
+        elif self.headphones_type == "Combinated" and not(all([self.cabel_lenght, self.work_radius, self.work_time, self.charging_time])):
+            raise ValueError('Введіть коректні дані для комбінованого типу зєднання')
+        if self.microphone and not(all([self.microphone_num, microphone_sensivity])):
+            raise ValueError("Введіть дані які необхідні за наявності мікрофону")
+        if not(self.microphone) and any([self.microphone_num, microphone_sensivity]):
+            raise ValueError("Ви ввели дані для мікрофону не вибравши його")
+
+
+    def __str__(self):
+        return str(self.id)
+
+    class Meta:
+        verbose_name = 'Клавіатура'
+        verbose_name_plural = 'Клавіатури'
