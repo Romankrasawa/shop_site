@@ -8,7 +8,7 @@ from shop.services.update_user_modal import execute
 
 logger = logging.getLogger(__name__)
 
-@cache_page(60)
+# @cache_page(60)
 def home(request):
     context = {
             'title': 'Головна',
