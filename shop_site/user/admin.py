@@ -7,15 +7,15 @@ from .models import User
 @admin.register(User)
 class MyUserAdmin(UserAdmin):
         model = User
-        list_display = ('slug', 'username','email', 'get_avatar', 'created_at', 'is_superuser', 'is_active')
-        list_display_links = ('slug',)
-        list_editable = ('username','email', 'is_superuser', 'is_active')
+        list_display = ('pk','username', 'last_name', 'email', 'get_avatar', 'created_at', 'is_superuser', 'is_active')
+        list_display_links = ('pk',)
+        list_editable = ('username', 'last_name','email', 'is_superuser', 'is_active')
         list_filter = ('is_superuser','is_active', 'created_at')
-        search_fields = (('email', 'username',))
+        search_fields = ('email', 'username', 'last_name')
         ordering = ('created_at',)
         filter_horizontal = ()
         fieldsets = (
                 ("Fields", {
-                        'fields': ('slug','email', 'is_staff', 'is_superuser', 'password'),
+                        'fields': ('email', 'is_staff', 'is_superuser', 'password'),
                 }),
         )

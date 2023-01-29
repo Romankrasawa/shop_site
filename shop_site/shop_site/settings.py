@@ -29,7 +29,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -83,13 +83,13 @@ TEMPLATES = [
 WSGI_APPLICATION = 'shop_site.wsgi.application'
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
+    'user.auth_backend.UserBackend',
     'allauth.account.auth_backends.AuthenticationBackend'
 ]
 
 AUTH_USER_MODEL = 'user.User'
 
-SOCIALACCOUNT_ADAPTER = 'user.models.CustomSocialAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'user.auth_backend.CustomSocialAccountAdapter'
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -139,6 +139,19 @@ CACHES = {
     }
 }
 
+#Celery configuration
+
+REDIS_HOST = '127.0.0.1' 
+REDIS_PORT = '6379' 
+RABBITMQ_HOST = '127.0.0.1' 
+RABBITMQ_PORT = '5672' 
+CELERY_BROKER_URL = 'amqp://' + 'myuser:changeme@'+ RABBITMQ_HOST + ':' + RABBITMQ_PORT + '//'
+CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/1'
+CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
+CELERY_STORE_ERRORS_EVEN_IF_IGNORED = True
+CELERY_ACKS_LATE = True
+CELERY_ENABLE_UTC = True
+CELERY_TIMEZONE = 'Etc/UTC'
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 

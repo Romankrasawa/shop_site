@@ -726,6 +726,7 @@ class Keyboard(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
 
     keyboard_type = models.CharField(max_length = 30, choices=Keyboard_type.choices, verbose_name="Тип Кнопок")
+    keyboard_form = models.CharField(max_length = 30, choices=Keyboard_form.choices, verbose_name="Тип клавіатури")
     connection_type = models.CharField(max_length = 30, choices=Connection_type.choices, verbose_name="Тип підключення")
     charging_time = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Час заряджання", blank=True, null=True)
     work_time = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Час роботи", blank=True, null=True)
@@ -735,7 +736,7 @@ class Keyboard(models.Model):
     OS = ArrayField(models.CharField(max_length = 17, choices = OSes_compability.choices), size=3, verbose_name="Сумісність з ОС")
 
     connectors_ports = ArrayField(models.CharField(max_length = 20), size=20, verbose_name="Розєми та порти")
-    hands = models.BooleanField(verbose_name="Підсвітка")
+    backlight = models.BooleanField(verbose_name="Підсвітка")
 
     simetrical = models.BooleanField(verbose_name="Для обох рук(семетрична)")
     colour = models.CharField(max_length = 8, choices=CustomColours.choices, verbose_name="Колір")
@@ -760,9 +761,9 @@ class Keyboard(models.Model):
 
     @property
     def short_characteristics(self):
-        return f"Кнопки: {self.get_buttons_type_display()} / \
+        return f"Тип: {self.get_keyboard_type_display()} / \
+                Форма: {self.get_keyboard_form_display}\
                 Підєднання: {self.connection_type} / \
-                {'Особливості: ' if any([self.backlight, self.simetrical]) else ''}\
                 {'Підсвітка, ' if self.backlight else ''}\
                 {'Для обох рук(семетрична)' if self.simetrical else ''} / \
                 Сумісність з ОС: {self.get_OS}"

@@ -24,8 +24,18 @@ services:
     ports:
       - '6379:6379'
     restart: unless-stopped
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    environment:
+      - RABBITMQ_DEFAULT_USER=myuser
+      - RABBITMQ_DEFAULT_PASS=changeme
+    container_name: 'rabbitmq_container'
+    ports:
+        - 5672:5672
+        - 15672:15672
 volumes:
     db: 
       driver: local
     cache:
       driver: local
+
