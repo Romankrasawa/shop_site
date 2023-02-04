@@ -1,10 +1,10 @@
 import os
-import shop_site
+import config 
 from celery import Celery
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop_site.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 
-app = Celery('shop_site')
+app = Celery('config')
 
 app.config_from_object('django.conf:settings', namespace='CELERY')
 

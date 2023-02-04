@@ -10,7 +10,10 @@ from .tasks import summ
 
 logger = logging.getLogger(__name__)
 
-# @cache_page(60)
+
+def error_500(request, message: str = "Error"):
+    return render(request, 'shop/500.html', context={"message" : message})
+
 def home(request):
     context = {
             'title': 'Головна',
@@ -24,6 +27,7 @@ def search(request):
     context = {
             'title': 'Пошук',
             }
+    raise Exception("hello this is error")
     cat = request.session["category"]["29474883"] = request.session["category"].get('29474883', 0) + 1
     request.session.modified = True
     logger.debug(cat , extra={'user': request.user})

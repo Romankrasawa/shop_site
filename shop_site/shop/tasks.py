@@ -1,5 +1,5 @@
 import logging
-from shop_site.celery import app
+from config.celery import app
 
 logger = logging.getLogger(__name__)
 

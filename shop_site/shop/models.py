@@ -1,69 +1,162 @@
 from enum import unique
 from django.conf import settings
 from django.db import models
-from django.db.models import Count, constraints
+from django.db.models import Count, ForeignKey, constraints
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse_lazy
 from django.core.exceptions import ValidationError
-from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
+from django.core.validators import RegexValidator, MinValueValidator
 from uuid import uuid4
 from random import randint
 from slugify import slugify
 
+
 from .choices import *
 
+def banner_file_name(self, filename):
+    """
+    Return a path where store photo for banner
+    """
+    return f"banner/{self.product.pk}/{filename}"
 
-def photos_file_name(self, filename):
-    return f"photos/{self.product.pk}/{filename}"
+
+def product_file_name(self, filename):
+    """
+    Return a path where store photo for product
+    """
+    return f"product/{self.product.pk}/{filename}"
 
 def create_code():
+    """
+    Creates code of 15 random nums from 0 to 9. Used for Primary Keys
+    """
     return "".join([str(randint(0, 9)) for _ in range(15)])
+
+class Adress(models.Model):
+
+    adress = models.CharField(
+            max_length=255, primary_key=True,
+            verbose_name="Адресса магазину/складу"
+    )
+
+class Banner(models.Model):
+
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+
+    photo = models.ImageField(
+            upload_to=banner_file_name, verbose_name="Фото",
+            default='default/default_banner.jpg'
+    )
+
+    class Meta:
+        verbose_name = "Баннер"
+        verbose_name_plural = "Баннери"
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=25, choices=Categories.choices, verbose_name="Назва")
-    name_plural = models.CharField(max_length=25, choices=Categories_plural.choices, verbose_name="Назва в множині")
+    #Name of category
+    name = models.CharField(
+            max_length=25, choices=Categories.choices,
+            verbose_name="Назва", primary_key=True
+    )
+    #Plural name of category
+    name_plural = models.CharField(
+            max_length=25, choices=Categories_plural.choices,
+            verbose_name="Назва в множині"
+    )
 
     class Meta:
         verbose_name = "Категорія"
         verbose_name_plural = "Категорії"
 
 class Product(models.Model):
-
-    code = models.CharField(max_length=15, primary_key=True, default=create_code, editable=False, unique=True)
+    #Primary key of product which is created by function create_code
+    code = models.CharField(
+            max_length=15, primary_key=True, default=create_code,
+            editable=False, unique=True
+    )
+    #Slug which is created by slugifing name
     slug = models.SlugField(max_length=100, blank=True)
+    #Brend of product like samsung or apple 
     brend = models.CharField(max_length=50, verbose_name="Бренд")
+    #name of product(model)
     name = models.CharField(max_length=100, verbose_name="Назва", unique=True)
-    created_at = models.DateTimeField(auto_now_add = True, verbose_name="Створено")
+    #date and time when product was added
+    created_at = models.DateTimeField(
+            auto_now_add = True, verbose_name="Створено"
+    )
+    #date and time when product was updated last time
     updated_at = models.DateTimeField(auto_now = True, verbose_name="Оновлено")
-    search_name = models.CharField(max_length=100, verbose_name="Назва для пошуку", blank=True)
-    price = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Ціна")
+    #search name of product which is created by swithcing name to lower case
+    search_name = models.CharField(
+            max_length=100, verbose_name="Назва для пошуку", blank=True
+    )
+    #price of product(digit)
+    price = models.FloatField(
+            validators=[MinValueValidator(0.01)] ,verbose_name="Ціна"
+    )
+    #if product is on sale or not
     on_sale = models.BooleanField(verbose_name="На акції")
-    sale_price = models.FloatField(validators=[MinValueValidator(0.01)] ,verbose_name="Акція", blank=True, null=True)
+    #prise of product if it is on sale(only if on_sale == True)
+    sale_price = models.FloatField(
+            validators=[MinValueValidator(0.01)] ,verbose_name="Акція",
+            blank=True, null=True
+    )
+    #text description of product
     description = models.CharField(max_length=2500, verbose_name="Опис")
-    release_year = models.PositiveIntegerField(verbose_name="Рік випуску моделі")
+    #year when product has been released
+    release_year = models.PositiveIntegerField(
+            verbose_name="Рік випуску моделі"
+    )
+    #nember of products that are aviable now
     number_aviable = models.PositiveIntegerField(verbose_name="Кількість")
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="product", verbose_name="Категорія")
-    producing_country = models.CharField(max_length = 50, verbose_name="Країна виробник")
-    additional_characteristics = ArrayField(models.CharField(max_length = 50), size=20,blank=True, null=True, verbose_name="Додаткові характеристики")
-    complect = ArrayField(models.CharField(max_length = 50), size=20, verbose_name="Комплектація")
+    #Category of product
+    category = models.ForeignKey(
+            Category, on_delete=models.CASCADE,
+            related_name="product", verbose_name="Категорія"
+    )
+    #Country which created and is producing this product
+    producing_country = models.CharField(
+            max_length = 50, verbose_name="Країна виробник"
+    )
+    #Additional characteristics whics isnt in ProductType characteristics(array)
+    additional_characteristics = ArrayField(
+            models.CharField(max_length = 50), size=20, blank=True,
+            null=True, verbose_name="Додаткові характеристики"
+    )
+    #Complect which goes with product(array)
+    complect = ArrayField(
+            models.CharField(max_length = 50), size=20,
+            verbose_name="Комплектація"
+    )
+    #number of monthes garanty on this product
     garanty = models.PositiveIntegerField(verbose_name="Гарантія")
+    #number of views on this product
     views = models.PositiveIntegerField(verbose_name="Перегляди")
 
+    #block of fields to connect different characteristic models to field content_object
     content_type = models.ForeignKey(ContentType,  on_delete=models.CASCADE)
     object_id = models.UUIDField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
     @property
     def aviable(self):
-        return "В наявності" if self.number_aviable > 3 else "Немає в наявності" if self.number_aviable == 0 else "Закінчується"
+        """
+        property which returns sting which says if product is aviable
+        """
+        return ("В наявності" if self.number_aviable > 3 
+                else "Немає в наявності" if self.number_aviable == 0
+                else "Закінчується")
     aviable.fget.short_description = "Наявність"
 
     def save(self, *args, **kwargs):
+        """
+        creating slug by slugifing name and search_name is name to lowercase
+        """
         self.slug = slugify(self.name)
-        self.search_title = self.name.lower()
+        self.search_name = self.name.lower()
         super(Product, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -79,12 +172,40 @@ class Product_photo(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
 
-    photo = models.ImageField(upload_to=photos_file_name, verbose_name="Фото", default='default/default_photo.jpg')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name="Продукт", related_name='product_photo')
+    photo = models.ImageField(
+            upload_to=product_file_name, verbose_name="Фото",
+            default='default/default_photo.jpg'
+    )
+
+    product = models.ForeignKey(
+            Product, on_delete=models.CASCADE,
+            verbose_name="Продукт", related_name='product_photo'
+    )
 
     class Meta:
         verbose_name = "Фото товару"
         verbose_name_plural = "Фото товарів"
+
+class Comment(models.Model):
+
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+
+    user = ForeignKey(
+            "user.User", on_delete=models.CASCADE, verbose_name="Користувач"
+    )
+    product = models.ForeignKey(
+            Product, on_delete=models.CASCADE,
+            verbose_name="Продукт"
+    )
+
+    text = models.TextField(verbose_name="Текст")
+    created_at = models.DateTimeField(
+            auto_now_add = True, verbose_name="Створено"
+    )
+    #date and time when product was updated last time
+    updated_at = models.DateTimeField(auto_now = True, verbose_name="Оновлено")
+
+
 
 class Order(models.Model):
     code = models.CharField(max_length=15, primary_key=True, default=create_code, editable=False, unique=True)
@@ -642,9 +763,9 @@ class Headphones(models.Model):
                 Мікрофон: {'Наявний' if self.microphone else 'Немає'}"
 
     def clean(self):
-        if self.headphones_type == "Wireless" and (self.charging_time == None or self.work_time == None or self.work_radius == None or not(self.cabel_lenght == Null)):
+        if self.headphones_type == "Wireless" and (self.charging_time == None or self.work_time == None or self.work_radius == None or not(self.cabel_lenght == None)):
             raise ValueError("Введіть коректні дані для Безпровідного типу зєднання")
-        elif self.headphones_type == "Leading" and (not(self.charging_time == None) or not(self.work_time == None) or not(self.work_radius == None) or self.cabel_lenght == Null):
+        elif self.headphones_type == "Leading" and (not(self.charging_time == None) or not(self.work_time == None) or not(self.work_radius == None) or self.cabel_lenght == None):
             raise ValueError("Введіть коректні дані для Провідного типу зєднання")
         elif self.headphones_type == "Combinated" and not(all([self.cabel_lenght, self.work_radius, self.work_time, self.charging_time])):
             raise ValueError('Введіть коректні дані для комбінованого типу зєднання')
@@ -706,9 +827,9 @@ class Mouse(models.Model):
                 Сумісність з ОС: {self.get_OS}"
 
     def clean(self):
-        if self.headphones_type == "Wireless" and (self.charging_time == None or self.work_time == None or self.work_radius == None or not(self.cabel_lenght == Null)):
+        if self.headphones_type == "Wireless" and (self.charging_time == None or self.work_time == None or self.work_radius == None or not(self.cabel_lenght == None)):
             raise ValueError("Введіть коректні дані для Безпровідного типу зєднання")
-        elif self.headphones_type == "Leading" and (not(self.charging_time == None) or not(self.work_time == None) or not(self.work_radius == None) or self.cabel_lenght == Null):
+        elif self.headphones_type == "Leading" and (not(self.charging_time == None) or not(self.work_time == None) or not(self.work_radius == None) or self.cabel_lenght == None):
             raise ValueError("Введіть коректні дані для Провідного типу зєднання")
         elif self.headphones_type == "Combinated" and not(all([self.cabel_lenght, self.work_radius, self.work_time, self.charging_time])):
             raise ValueError('Введіть коректні дані для комбінованого типу зєднання')
@@ -762,24 +883,19 @@ class Keyboard(models.Model):
     @property
     def short_characteristics(self):
         return f"Тип: {self.get_keyboard_type_display()} / \
-                Форма: {self.get_keyboard_form_display}\
+                Форма: {self.get_keyboard_form_display()}\
                 Підєднання: {self.connection_type} / \
                 {'Підсвітка, ' if self.backlight else ''}\
                 {'Для обох рук(семетрична)' if self.simetrical else ''} / \
                 Сумісність з ОС: {self.get_OS}"
 
     def clean(self):
-        if self.headphones_type == "Wireless" and (self.charging_time == None or self.work_time == None or self.work_radius == None or not(self.cabel_lenght == Null)):
+        if self.connection_type == "Wireless" and (self.charging_time == None or self.work_time == None or self.work_radius == None or not(self.cabel_lenght == None)):
             raise ValueError("Введіть коректні дані для Безпровідного типу зєднання")
-        elif self.headphones_type == "Leading" and (not(self.charging_time == None) or not(self.work_time == None) or not(self.work_radius == None) or self.cabel_lenght == Null):
+        elif self.connection_type == "Leading" and (not(self.charging_time == None) or not(self.work_time == None) or not(self.work_radius == None) or self.cabel_lenght == None):
             raise ValueError("Введіть коректні дані для Провідного типу зєднання")
-        elif self.headphones_type == "Combinated" and not(all([self.cabel_lenght, self.work_radius, self.work_time, self.charging_time])):
+        elif self.connection_type == "Combinated" and not(all([self.cabel_lenght, self.work_radius, self.work_time, self.charging_time])):
             raise ValueError('Введіть коректні дані для комбінованого типу зєднання')
-        if self.microphone and not(all([self.microphone_num, microphone_sensivity])):
-            raise ValueError("Введіть дані які необхідні за наявності мікрофону")
-        if not(self.microphone) and any([self.microphone_num, microphone_sensivity]):
-            raise ValueError("Ви ввели дані для мікрофону не вибравши його")
-
 
     def __str__(self):
         return str(self.id)

@@ -469,6 +469,21 @@ requests = "*"
 requests-oauthlib = ">=0.3.0"
 
 [[package]]
+name = "django-phone-field"
+version = "1.8.1"
+description = "Lightweight model and form field for phone numbers in Django"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "django-phone-field-1.8.1.tar.gz", hash = "sha256:db63af60fc3a3c66b9faa7e72bb7972cd1518299f2e93d68dd95d8df6214f7ed"},
+    {file = "django_phone_field-1.8.1-py3-none-any.whl", hash = "sha256:407e74b65e8f7dd14d0a0aa89e277516d57ad6a09ce992cdd94e15b1624b9961"},
+]
+
+[package.dependencies]
+Django = ">=1.10"
+
+[[package]]
 name = "django-redis"
 version = "5.2.0"
 description = "Full featured redis cache backend for Django."
@@ -950,4 +965,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "452084d073d1f228ca6677d46846036f6e0d7d1540e3e4022f77cea435cb0337"
+content-hash = "8c57a5dc86463095c5210e1bf8812e423b7a7e5b9b7b0178d1731dfb6c33e84f"
