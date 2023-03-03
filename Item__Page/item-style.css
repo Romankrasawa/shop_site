@@ -279,3 +279,134 @@
      color: #FFFFFF;
 
  }
+
+
+
+
+.character-section {
+    width: 100%;
+
+    display: flex;
+    justify-content: center;
+
+    margin: 150px 0 80px;
+  }
+
+  .character-section .accordion {
+    min-width: 100%;
+  }
+
+  .character-item {
+    display: flex;
+  }
+
+  .character-item h4, p {
+    display: inline-block;
+  }
+
+  .character-item h4 {
+    margin-right: 60px;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  .feedback-box-display {
+    display: none;
+  }
+
+  .feedback-box {
+    /* display: none; */
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100vh;
+    z-index: 1000;
+
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+  }
+
+  .feedback-box .card{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+  }
+
+  .feedback__btn {
+    margin-top: 10px;
+  }
+
+  
+
+
+
+
+.rate {
+    float: left;
+    height: 46px;
+    padding: 0 10px;
+}
+.rate:not(:checked) > input {
+    position:absolute;
+    top:-9999px;
+}
+.rate:not(:checked) > label {
+    float:right;
+    width:1em;
+    overflow:hidden;
+    white-space:nowrap;
+    cursor:pointer;
+    font-size:30px;
+    color:#ccc;
+}
+.rate:not(:checked) > label:before {
+    content: '★ ';
+}
+.rate > input:checked ~ label {
+    color: #ffc700;    
+}
+.rate:not(:checked) > label:hover,
+.rate:not(:checked) > label:hover ~ label {
+    color: #deb217;  
+}
+.rate > input:checked + label:hover,
+.rate > input:checked + label:hover ~ label,
+.rate > input:checked ~ label:hover,
+.rate > input:checked ~ label:hover ~ label,
+.rate > label:hover ~ input:checked ~ label {
+    color: #c59b08;
+}
+
+
+.rate-and-btn {
+    display: flex;
+    justify-content: space-between;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.user-feedback__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
